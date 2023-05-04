@@ -14,6 +14,9 @@ random.seed(55)
 audiocaps_dir = "/mnt/rblack/data/AudioCaps/videos/audios_16k/all/"
 audioset_dir = "/mnt/rblack/data/AudioSet/videos/"
 ontology_path = "/mnt/rblack/data/AudioSet/metadata/ontology.json"
+
+assert os.path.exists(audiocaps_dir) and os.path.exists(audioset_dir) and os.path.exists(ontology_path), "Please make sure you have all data downloaded"
+
 # Output path for simulation data
 output_dir = "./output/"
 
@@ -22,7 +25,6 @@ CLIP_LEN = 2.0
 HCLIP_LEN = CLIP_LEN / 2
 
 anchors_file = "anchors/all.txt"
-tags_file = "tags/tags.txt"
 list_files = {
     "train": "lists/train.txt",
     "val": "lists/val.txt",
@@ -60,7 +62,6 @@ if __name__ == "__main__":
 
 
     anchors = {}
-    tags = {}
 
     with open(anchors_file) as f:
         for line in f:
@@ -72,14 +73,7 @@ if __name__ == "__main__":
                 assert anchor == anchors[wav_id]
             anchors[wav_id] = anchor
 
-    with open(tags_file) as f:
-        for line in f:
-            line = line.strip().split()
-            assert len(line) == 3
-            wav_id, tag, super_tag = line
-            if wav_id in tags:
-                assert tag == tags[wav_id]
-            tags[wav_id] = tag
+
 
     os.makedirs(output_dir, exist_ok=True)
 
@@ -91,18 +85,16 @@ if __name__ == "__main__":
         os.makedirs(f"{output_dir}/{folder}/wavs/mix", exist_ok=True)
         with open(list_file) as list_file, \
             open(f"{output_dir}/{folder}/wav.scp", 'w') as mix_scp, \
-            open(f"{output_dir}/{folder}/spk1.scp", 'w') as s1_scp, \
-            open(f"{output_dir}/{folder}/tags.scp", 'w') as tags_scp, \
-            open(f"{output_dir}/{folder}/spk2.scp", 'w') as s2_scp:
+            open(f"{output_dir}/{folder}/s1.scp", 'w') as s1_scp, \
+            open(f"{output_dir}/{folder}/s2.scp", 'w') as s2_scp:
             for line in tqdm.tqdm(list_file):
-                wav_id_1, wav_id_2 = line.strip().split()
+                wav_id_1, wav_id_2, gain_in_db = line.strip().split()
 
                 s1, s2 = read_audio(wav_id_1), read_audio(wav_id_2)
                 if s1 is None or s2 is None:
                     continue
 
                 anchor_1, anchor_2 = anchors[wav_id_1], anchors[wav_id_2]
-                tag_1, tag_2 = tags[wav_id_1], tags[wav_id_2]
 
 
                 st1 = int((anchor_1 * SR)) - int(SR * HCLIP_LEN)
@@ -136,7 +128,7 @@ if __name__ == "__main__":
                 s1 = s1 / numpy.sqrt(eng1)
                 s2 = s2 / numpy.sqrt(eng2)
 
-                gain_in_db = random.uniform(-2, 2)
+                gain_in_db = float(gain_in_db)
                 gain = 10 ** (gain_in_db / 20.0)
                 s1 = s1 * gain
 
@@ -160,7 +152,6 @@ if __name__ == "__main__":
                 mix_scp.write(f"{uid} {mix_path}\n")
                 s1_scp.write(f"{uid} {s1_path}\n")
                 s2_scp.write(f"{uid} {s2_path}\n") 
-                tags_scp.write(f"{uid} {tag_1} {tag_2}\n")
 
 
 
