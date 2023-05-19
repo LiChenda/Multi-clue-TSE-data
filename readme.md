@@ -19,3 +19,18 @@ This is the data simulation scirpt for paper "Target Sound Extraction (TSE) with
 - [x] Video clue
 - [x] Text clue
 
+### Citations:
+
+```
+@inproceedings{liTargetSoundExtraction2023a,
+  title = {Target {{Sound Extraction}} with {{Variable Cross-Modality Clues}}},
+  booktitle = {{{ICASSP}} 2023 - 2023 {{IEEE International Conference}} on {{Acoustics}}, {{Speech}} and {{Signal Processing}} ({{ICASSP}})},
+  author = {Li, Chenda and Qian, Yao and Chen, Zhuo and Wang, Dongmei and Yoshioka, Takuya and Liu, Shujie and Qian, Yanmin and Zeng, Michael},
+  year = {2023},
+  month = jun,
+  pages = {1--5},
+  doi = {10.1109/ICASSP49357.2023.10095266},
+}
+
+
+```
